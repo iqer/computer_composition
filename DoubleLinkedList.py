@@ -69,6 +69,7 @@ class DoubleLinkedList:
             self.tail.next = None
         else:
             self.head = self.tail = None
+        self.size -= 1
 
     def __remove(self, node):
         if not node:
