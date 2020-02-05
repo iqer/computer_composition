@@ -25,11 +25,9 @@ class LFUCache:
             if not self.freq_map[freq].head:
                 del self.freq_map[freq]
         node.freq += 1
-        if node.freq in self.freq_map:
-            self.freq_map[node.freq].append(node)
-        else:
+        if node.freq not in self.freq_map:
             self.freq_map[node.freq] = DoubleLinkedList()
-            self.freq_map[node.freq].append(node)
+        self.freq_map[node.freq].append(node)
 
     def get(self, key):
         if key in self.map:
@@ -46,25 +44,25 @@ class LFUCache:
             self.__update_freq(node)
         else:
             node = LFUNode(key, value)
-            # node.freq = 1
             if self.size == self.capacity:
                 min_freq = min(self.freq_map)
-                self.freq_map[min_freq].pop()
+                old_node = self.freq_map[min_freq].pop()
+                self.map.pop(old_node.key)
                 self.size -= 1
             self.map[key] = node
             self.__update_freq(node)
             self.size += 1
 
     def print(self):
-        print('**************************')
+        print('*****************')
         for k, v in self.freq_map.items():
             print('freq: %s' % k)
             v.print()
-        print('**************************')
+        print('*****************')
         print()
 
 
-if __name__ == '__main__':
+if __name__  == '__main__':
     lfu = LFUCache(4)
     lfu.put(1, 1)
     lfu.print()
