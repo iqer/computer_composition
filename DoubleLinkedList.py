@@ -93,7 +93,7 @@ class DoubleLinkedList:
     def append_front(self, node):
         return self.__add_head(node)
 
-    def remove_node(self, node=None):
+    def remove(self, node=None):
         return self.__remove(node)
 
     def print(self):
@@ -127,8 +127,8 @@ if __name__ == '__main__':
     d_l.print()
     d_l.append(nodes[4])
     d_l.print()
-    d_l.remove_node(nodes[2])
+    d_l.remove(nodes[2])
     d_l.print()
-    d_l.remove_node()
+    d_l.remove()
     d_l.print()
 

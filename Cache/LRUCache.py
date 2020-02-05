@@ -14,7 +14,7 @@ class LRUCache:
     def get(self, key):
         if key in self.map:
             node = self.map[key]
-            self.list.remove_node(node)
+            self.list.remove(node)
             self.list.append_front(node)
             return node.value
         return -1
@@ -23,11 +23,11 @@ class LRUCache:
         node = Node(key, value)
         if key in self.map:
             old_node = self.map[key]
-            self.list.remove_node(old_node)
+            self.list.remove(old_node)
             self.list.append_front(node)
         else:
             if self.size == self.capacity:
-                old_node = self.list.remove_node()
+                old_node = self.list.remove()
                 self.map.pop(old_node.key)
                 self.size -= 1
             self.map[key] = node

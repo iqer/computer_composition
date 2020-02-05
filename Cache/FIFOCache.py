@@ -20,7 +20,7 @@ class FIFOCache:
     def put(self, key, value):
         if key in self.map:
             node = self.map.get(key)
-            self.double_linked_list.remove_node(node)
+            self.double_linked_list.remove(node)
             node.value = value
             self.double_linked_list.append(node)
         else:
