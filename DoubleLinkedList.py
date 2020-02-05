@@ -103,6 +103,7 @@ class DoubleLinkedList:
             p = p.next
             if p:
                 output += '==>'
+        output += '  size:%s' % self.size
         print(output)
 
 
