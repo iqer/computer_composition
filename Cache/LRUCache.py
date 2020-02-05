@@ -22,8 +22,7 @@ class LRUCache:
     def put(self, key, value):
         node = Node(key, value)
         if key in self.map:
-            old_node = self.map.pop(key)
-            self.map[key] = node
+            old_node = self.map[key]
             self.list.remove_node(old_node)
             self.list.append_front(node)
         else:
@@ -50,3 +49,5 @@ if __name__ == '__main__':
     lru.put(3, 3)
     lru.print()
     print(lru.get(4))
+    lru.print()
+
