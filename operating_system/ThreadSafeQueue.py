@@ -23,10 +23,8 @@ class ThreadSafeQueue:
         return size
 
     def put(self, item):
-        if self.max_size <= 0:
+        if self.max_size != 0 and self.size() > self.max_size:
             return ThreadSafeException()
-        if self.size() == self.max_size:
-            self.condition.wait()
         self.lock.acquire()
         self.queue.append(item)
         self.lock.release()
@@ -41,29 +39,22 @@ class ThreadSafeQueue:
             self.put(item)
 
     def pop(self, block=False, timeout=0):
-        if self.max_size <= 0:
-            return ThreadSafeException
         if self.size() == 0:
             if block:
-                time.sleep(timeout)
-        if self.size() == 0:
-            return None
+                self.condition.acquire()
+                self.condition.wait(timeout=timeout)
+                self.condition.release()
+            else:
+                return None
+
         self.lock.acquire()
-        item = self.queue.pop()
+        item = None
+        if len(self.queue) > 0:
+            item = self.queue.pop()
         self.lock.release()
-        self.condition.acquire()
-        self.condition.notify()
-        self.condition.release()
         return item
 
-    def get(self, index, block=False, timeout=0):
-        if self.max_size <= 0:
-            return ThreadSafeException
-        if self.size() == 0:
-            if block:
-                time.sleep(timeout)
-        if self.size() == 0:
-            return None
+    def get(self, index):
         self.lock.acquire()
         item = self.queue[index]
         self.lock.release()

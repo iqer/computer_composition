@@ -35,8 +35,8 @@ class ThreadPool:
 
     def __init__(self, size=0):
         if not size:
-            self.size = psutil.cpu_count() * 2
-        self.task_queue = ThreadSafeQueue(self.size)
+            size = psutil.cpu_count() * 2
+        self.task_queue = ThreadSafeQueue(size)
         self.pool = ThreadSafeQueue()
         for i in range(size):
             self.pool.put(ProcessThread(self.task_queue))
@@ -44,7 +44,7 @@ class ThreadPool:
     def start(self):
         for i in range(self.size()):
             thread = self.pool.get(i)
-            thread.run()
+            thread.start()
 
     def join(self):
         for i in range(self.size()):
