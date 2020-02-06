@@ -1,17 +1,17 @@
 # -*- encoding:utf-8 -*-
 
-
 import threading
 from operating_system.task import Task
+
 
 class ProcessThread(threading.Thread):
 
     def __init__(self, task_queue, *args, **kwargs):
-        threading.Thread.__init__(self, *args, **kwargs)
-        self.args = args
-        self.kwargs = kwargs
+        threading.Thread.__init__(self)
         self.task_queue = task_queue
         self.dismiss_flag = threading.Event()
+        self.args = args
+        self.kwargs = kwargs
 
     def run(self):
         while True:
@@ -22,9 +22,8 @@ class ProcessThread(threading.Thread):
                 continue
             result = task.callable(*task.args, **task.kwargs)
 
-    def stop(self):
-        self.dismiss()
-
     def dismiss(self):
         self.dismiss_flag.set()
 
+    def stop(self):
+        self.dismiss()
