@@ -1,10 +1,10 @@
 # -*- encoding:utf-8 -*-
 
+import threading
 import time
-from threading import Lock, Condition, Thread
 
 
-class ThreadSafeQueueException(Exception):
+class ThreadSafeException(Exception):
     pass
 
 
@@ -13,8 +13,8 @@ class ThreadSafeQueue:
     def __init__(self, max_size=0):
         self.max_size = max_size
         self.queue = list()
-        self.lock = Lock()
-        self.condition = Condition()
+        self.lock = threading.Lock()
+        self.condition = threading.Condition()
 
     def size(self):
         self.lock.acquire()
@@ -23,8 +23,8 @@ class ThreadSafeQueue:
         return size
 
     def put(self, item):
-        if self.max_size == 0:
-            return ThreadSafeQueueException()
+        if self.max_size <= 0:
+            return ThreadSafeException()
         if self.size() == self.max_size:
             self.condition.wait()
         self.lock.acquire()
@@ -41,6 +41,8 @@ class ThreadSafeQueue:
             self.put(item)
 
     def pop(self, block=False, timeout=0):
+        if self.max_size <= 0:
+            return ThreadSafeException
         if self.size() == 0:
             if block:
                 time.sleep(timeout)
@@ -55,8 +57,8 @@ class ThreadSafeQueue:
         return item
 
     def get(self, index, block=False, timeout=0):
-        if self.max_size == 0:
-            return ThreadSafeQueueException()
+        if self.max_size <= 0:
+            return ThreadSafeException
         if self.size() == 0:
             if block:
                 time.sleep(timeout)
@@ -65,9 +67,6 @@ class ThreadSafeQueue:
         self.lock.acquire()
         item = self.queue[index]
         self.lock.release()
-        self.condition.acquire()
-        self.condition.notify()
-        self.condition.release()
         return item
 
 
@@ -82,10 +81,11 @@ if __name__ == '__main__':
     def consumer():
         while True:
             item = queue.pop(block=True, timeout=2)
-            print('消费者获取到: %s' % item)
             time.sleep(1)
-    thread1 = Thread(target=produce)
-    thread2 = Thread(target=consumer)
+            print('获取到的元素为: %s' % item)
+
+    thread1 = threading.Thread(target=produce)
+    thread2 = threading.Thread(target=consumer)
     thread1.start()
     thread2.start()
     thread1.join()
