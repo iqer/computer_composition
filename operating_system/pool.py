@@ -2,7 +2,7 @@
 
 import psutil
 import threading
-from operating_system.task import Task
+from operating_system.task import Task, AsyncTask
 from operating_system.ThreadSafeQueue import ThreadSafeQueue
 
 
@@ -23,6 +23,8 @@ class ProcessThread(threading.Thread):
             if not isinstance(task, Task):
                 continue
             result = task.callable(*task.args, **task.kwargs)
+            if isinstance(task, AsyncTask):
+                task.set_result(result)
 
     def dismiss(self):
         self.dismiss_flag.set()
