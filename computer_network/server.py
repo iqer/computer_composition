@@ -7,6 +7,7 @@ import socket
 from operating_system.pool import ThreadPool as tp
 from operating_system.task import AsyncTask
 from computer_network.processor.net.parser import IPParser
+from computer_network.processor.tran.parser import UDPParser, TCPParser
 
 
 class ProcessTask(AsyncTask):
@@ -15,8 +16,19 @@ class ProcessTask(AsyncTask):
         super(ProcessTask, self).__init__(func=self.process, *args, **kwargs)
 
     def process(self):
+        headers = {
+            'network_header': None,
+            'transport_header': None
+        }
         ip_header = IPParser.ip_parse(self.packet)
-        return ip_header
+        headers['network_header'] = ip_header
+        if ip_header['protocol'] == 17:
+            udp_header = UDPParser.parse(self.packet)
+            headers['transport_header'] = udp_header
+        elif ip_header['protocol'] == 6:
+            tcp_header = TCPParser.parse(self.packet)
+            headers['transport_header'] = tcp_header
+        return headers
 
 
 class Server:
